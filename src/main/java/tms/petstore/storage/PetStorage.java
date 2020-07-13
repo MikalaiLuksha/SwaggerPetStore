@@ -43,35 +43,35 @@ public class PetStorage {
         return false;
     }
 
-    public boolean addDataCategory (Pet pet) {
-            try {
-                connection = DriverManager.getConnection(URL_TABLES, LOGIN_TABLES, PASS_TABLES);
-                PreparedStatement preparedStatement = connection.prepareStatement("insert into data_category (idpet, idcategory) values (?, ?) ");
-                preparedStatement.setInt(1, pet.getId());
-                preparedStatement.setInt(2, pet.getCategory().getId());
-                preparedStatement.execute();
-                connection.close();
-                return true;
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            return false;
-        }
-
-    public boolean addDataTags (Pet pet, Integer [] array) {
+    public boolean addDataCategory(Pet pet) {
         try {
-                connection = DriverManager.getConnection(URL_TABLES, LOGIN_TABLES, PASS_TABLES);
-                PreparedStatement preparedStatement = connection.prepareStatement("insert into data_tags (idpet, idtag) values (?, ?) ");
-                preparedStatement.setInt(1, pet.getId());
-                preparedStatement.setArray(2, connection.createArrayOf("integer", array));
-                preparedStatement.execute();
-                connection.close();
-                 return true;
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        return false;
+            connection = DriverManager.getConnection(URL_TABLES, LOGIN_TABLES, PASS_TABLES);
+            PreparedStatement preparedStatement = connection.prepareStatement("insert into data_category (idpet, idcategory) values (?, ?) ");
+            preparedStatement.setInt(1, pet.getId());
+            preparedStatement.setInt(2, pet.getCategory().getId());
+            preparedStatement.execute();
+            connection.close();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+        return false;
+    }
+
+    public boolean addDataTags(Pet pet, Integer[] array) {
+        try {
+            connection = DriverManager.getConnection(URL_TABLES, LOGIN_TABLES, PASS_TABLES);
+            PreparedStatement preparedStatement = connection.prepareStatement("insert into data_tags (idpet, idtag) values (?, ?) ");
+            preparedStatement.setInt(1, pet.getId());
+            preparedStatement.setArray(2, connection.createArrayOf("integer", array));
+            preparedStatement.execute();
+            connection.close();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
     public boolean updatePetById(Pet pet, int id) {
         try {
@@ -122,7 +122,7 @@ public class PetStorage {
         return false;
     }
 
-    public boolean updateTagsById(Pet pet, Integer [] array, int id) {
+    public boolean updateTagsById(Pet pet, Integer[] array, int id) {
         try {
             connection = DriverManager.getConnection(URL_TABLES, LOGIN_TABLES, PASS_TABLES);
             PreparedStatement preparedStatement = connection.prepareStatement("update data_tags set idpet = ?, idtag = ? where idpet = ?");
@@ -138,8 +138,8 @@ public class PetStorage {
         return false;
     }
 
-    public Pet getPetById(int id){
-         try {
+    public Pet getPetById(int id) {
+        try {
             String name = "";
             Status status = null;
             connection = DriverManager.getConnection(URL_TABLES, LOGIN_TABLES, PASS_TABLES);
@@ -147,19 +147,19 @@ public class PetStorage {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
             resultSet.next();
-                name = resultSet.getString(2);
-                status = (Status.valueOf(resultSet.getString(3)));
-                Category categoryByIdPet = getCategoryByIdPet(id);
-                List<Tags> tagsByIdPet = getTagsByIdPet(id);
-                connection.close();
-                return new Pet(id, categoryByIdPet, name, tagsByIdPet, status);
+            name = resultSet.getString(2);
+            status = (Status.valueOf(resultSet.getString(3)));
+            Category categoryByIdPet = getCategoryByIdPet(id);
+            List<Tags> tagsByIdPet = getTagsByIdPet(id);
+            connection.close();
+            return new Pet(id, categoryByIdPet, name, tagsByIdPet, status);
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public List<Pet> getPetFindByStatus(Status status){
+    public List<Pet> getPetFindByStatus(Status status) {
         List<Pet> list = new ArrayList<>();
         try {
             int id = 0;
@@ -184,8 +184,8 @@ public class PetStorage {
         return null;
     }
 
-    private Category getCategoryByIdPet(int idPet){
-           try {
+    private Category getCategoryByIdPet(int idPet) {
+        try {
             int idCategory = 0;
             connection = DriverManager.getConnection(URL_TABLES, LOGIN_TABLES, PASS_TABLES);
             PreparedStatement preparedStatement = connection.prepareStatement("select * from data_category where idpet = ?");
@@ -202,7 +202,7 @@ public class PetStorage {
         return null;
     }
 
-    private Category getCategoryById(int id){
+    private Category getCategoryById(int id) {
         String name = "";
         try {
             connection = DriverManager.getConnection(URL_TABLES, LOGIN_TABLES, PASS_TABLES);
@@ -210,8 +210,8 @@ public class PetStorage {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
             resultSet.next();
-             name = resultSet.getString(2);
-             Category category = new Category(id, name);
+            name = resultSet.getString(2);
+            Category category = new Category(id, name);
             connection.close();
             return category;
         } catch (SQLException e) {
@@ -220,8 +220,8 @@ public class PetStorage {
         return null;
     }
 
-    private List<Tags> getTagsByIdPet(int idPet){
-        List<Tags> tagsList= new ArrayList<>();
+    private List<Tags> getTagsByIdPet(int idPet) {
+        List<Tags> tagsList = new ArrayList<>();
         try {
             connection = DriverManager.getConnection(URL_TABLES, LOGIN_TABLES, PASS_TABLES);
             PreparedStatement preparedStatement = connection.prepareStatement("select * from data_tags where idpet = ?");
@@ -230,7 +230,7 @@ public class PetStorage {
             resultSet.next();
             Array array = resultSet.getArray(2);
             Integer[] arrayArray = (Integer[]) array.getArray();
-            for ( int idTags: arrayArray) {
+            for (int idTags : arrayArray) {
                 Tags tagById = getTagById(idTags);
                 tagsList.add(tagById);
             }
@@ -243,7 +243,7 @@ public class PetStorage {
     }
 
 
-    private Tags getTagById(int id){
+    private Tags getTagById(int id) {
         try {
             String name = "";
             connection = DriverManager.getConnection(URL_TABLES, LOGIN_TABLES, PASS_TABLES);
@@ -252,7 +252,7 @@ public class PetStorage {
             ResultSet resultSet = preparedStatement.executeQuery();
             resultSet.next();
             name = resultSet.getString(2);
-            Tags tags  =new Tags (id, name);
+            Tags tags = new Tags(id, name);
             connection.close();
             return tags;
         } catch (SQLException e) {
@@ -261,49 +261,57 @@ public class PetStorage {
         return null;
     }
 
-    public boolean removePetById( int id) {
+    public void removePetById(int id) {
         try {
             connection = DriverManager.getConnection(URL_TABLES, LOGIN_TABLES, PASS_TABLES);
             PreparedStatement preparedStatement = connection.prepareStatement("delete from pet where id = ? ");
             preparedStatement.setInt(1, id);
             preparedStatement.execute();
             connection.close();
-            return true;
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false;
     }
 
-    public boolean removeDataCategoryById( int id) {
+    public void removeDataCategoryById(int id) {
         try {
             connection = DriverManager.getConnection(URL_TABLES, LOGIN_TABLES, PASS_TABLES);
             PreparedStatement preparedStatement = connection.prepareStatement("delete from data_category where idpet = ? ");
             preparedStatement.setInt(1, id);
             preparedStatement.execute();
             connection.close();
-            return true;
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false;
     }
 
-    public boolean removeDataTagById( int id) {
+    public void removeDataTagById(int id) {
         try {
             connection = DriverManager.getConnection(URL_TABLES, LOGIN_TABLES, PASS_TABLES);
             PreparedStatement preparedStatement = connection.prepareStatement("delete from data_tags where idpet = ? ");
             preparedStatement.setInt(1, id);
             preparedStatement.execute();
             connection.close();
-            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean checkPet(int id) {
+        try {
+            connection = DriverManager.getConnection(URL_TABLES, LOGIN_TABLES, PASS_TABLES);
+            PreparedStatement preparedStatement = connection.prepareStatement("select * from pet  where id = ? ");
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            boolean next = resultSet.next();
+            connection.close();
+            return next;
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return false;
     }
-
-    }
+}
 
 
 

@@ -5,72 +5,88 @@ import tms.petstore.entity.Pet;
 import tms.petstore.entity.Status;
 import tms.petstore.storage.PetStorage;
 
+import javax.el.MethodNotFoundException;
 import java.util.List;
 
 @Service
 public class PetService {
 
-        private final PetStorage petStorage;
+    private final PetStorage petStorage;
 
 
     public PetService(PetStorage petStorage) {
         this.petStorage = petStorage;
     }
 
-    public boolean setPet(Pet pet){
+    public void setPet(Pet pet) {
         Integer[] arrayTags = serArrayTags(pet);
         boolean b = petStorage.addPet(pet);
         boolean b3 = petStorage.addDataCategory(pet);
         boolean b4 = petStorage.addDataTags(pet, arrayTags);
-        return b && b3 && b4;
+        boolean bb = b && b3 && b4;
+        if (!bb) {
+            throw new MethodNotFoundException("Invalid input");
+        }
     }
 
-    public boolean updatePet(Pet pet, int id){
+    public void updatePet(Pet pet, int id) {
+        checkPet(id);
         Integer[] arrayTags = serArrayTags(pet);
         boolean b = petStorage.updatePetById(pet, id);
         boolean b1 = petStorage.updateCategoryById(pet, id);
         boolean b2 = petStorage.updateTagsById(pet, arrayTags, id);
-        return b && b1 && b2;
+        boolean bb = b && b1 && b2;
+        if (!bb) {
+            throw new MethodNotFoundException("Validation exception");
+        }
     }
-
 
     public List<Pet> returnPerByStatus(Status status) {
-            return petStorage.getPetFindByStatus(status);
-     }
-
-     public Pet returnPet(int id){
-        return petStorage.getPetById(id);
-     }
-
-     public boolean updateNameAndStatusById(int id, String name, Status status){
-        return petStorage.updateNameAndStatusById(id, name, status);
-     }
-
-     public boolean deletedPetById ( int id ){
-         boolean b = petStorage.removePetById(id);
-         boolean b1 = petStorage.removeDataCategoryById(id);
-         boolean b2 = petStorage.removeDataTagById(id);
-         return  b && b1 && b2;
-     }
-
-    public boolean checkStatus (Status status){
-        boolean equals = status.equals(Status.available);
-        boolean equals1 = status.equals(Status.pending);
-        boolean equals2 = status.equals(Status.sold);
-        return equals || equals1 || equals2;
+        checkStatus(status);
+        return petStorage.getPetFindByStatus(status);
     }
 
+    public Pet returnPet(int id) {
+        checkPet(id);
+        return petStorage.getPetById(id);
+    }
 
+    public void updateNameAndStatusById(int id, String name, Status status) {
+        boolean b = petStorage.updateNameAndStatusById(id, name, status);
+        if (!b) {
+            throw new MethodNotFoundException("Invalid input");
+        }
+    }
 
+    public void deletedPetById(int id) {
+        checkPet(id);
+        petStorage.removePetById(id);
+        petStorage.removeDataCategoryById(id);
+        petStorage.removeDataTagById(id);
+    }
 
+    public void checkStatus(Status status) {
+        boolean e = status.equals(Status.available);
+        boolean e1 = status.equals(Status.pending);
+        boolean e2 = status.equals(Status.sold);
+        boolean f = e || e1 || e2;
+        if (!f) {
+            throw new IllegalArgumentException("Invalid status value");
+        }
+    }
 
+    private void checkPet(int id) {
+        boolean b = petStorage.checkPet(id);
+        if (!b) {
+            throw new NullPointerException("Pet not found");
+        }
+    }
 
-
-    private Integer [] serArrayTags(Pet pet){
+    private Integer[] serArrayTags(Pet pet) {
         int sizeArray = pet.getTags().size();
-        Integer [] arrayTags = new Integer[sizeArray];
+        Integer[] arrayTags = new Integer[sizeArray];
         for (int i = 0; i < sizeArray; i++) {
-            arrayTags [i] = pet.getTags().get(i).getId();
+            arrayTags[i] = pet.getTags().get(i).getId();
         }
         return arrayTags;
     }
